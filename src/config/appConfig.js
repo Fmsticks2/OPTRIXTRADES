@@ -16,7 +16,7 @@ const isTest = NODE_ENV === 'test';
 // Default configuration values
 const defaults = {
   // Server settings
-  port: 10000,
+  port: 3000,
   host: process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost',
   
   // Database settings
