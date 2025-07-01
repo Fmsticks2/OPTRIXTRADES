@@ -12,6 +12,23 @@ This guide will walk you through deploying the OPTRIXTRADES Telegram bot to Rend
 4. Redis instance (can be provisioned on Render or elsewhere)
 5. AWS S3 bucket for file storage
 
+### Security Considerations
+
+**Protecting Sensitive Environment Files**
+
+Never commit sensitive environment files to your repository. The following files should be excluded from Git:
+- `.env` - Contains development environment variables
+- `.env.production` - Contains production environment variables
+
+These files are already listed in `.gitignore`, but if they were previously committed, you need to remove them from Git tracking without deleting the files:
+
+```bash
+git rm --cached .env .env.production
+git commit -m "Remove sensitive environment files from tracking"
+```
+
+Use the provided `.env.production.example` as a template for creating your `.env.production` file.
+
 ### Deployment Steps
 
 #### 1. Set Up Database

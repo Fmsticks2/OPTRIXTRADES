@@ -105,6 +105,21 @@ S3_BUCKET_NAME=your_s3_bucket_name
 REDIS_URL=redis://localhost:6379
 ```
 
+### Protecting Sensitive Information
+
+**IMPORTANT**: Never commit sensitive environment files to your repository. The following files should be excluded from Git:
+- `.env` - Contains development environment variables
+- `.env.production` - Contains production environment variables
+
+These files are already listed in `.gitignore`, but if they were previously committed, you need to remove them from Git tracking without deleting the files:
+
+```bash
+git rm --cached .env .env.production
+git commit -m "Remove sensitive environment files from tracking"
+```
+
+Use the provided example files (`.env.example` and `.env.production.example`) as templates for creating your actual environment files.
+
 ## Commands
 
 - `/start` - Start the bot and register
@@ -153,7 +168,21 @@ We've included configuration files to make deployment to Render straightforward:
 2. `render.yaml` - Blueprint for automatic service setup on Render
 3. `.env.production` - Template for production environment variables
 
-See the `DeploymentGuide.md` for detailed deployment instructions.
+#### Quick Render Deployment Steps
+
+1. **Fork or clone this repository** to your GitHub account
+2. **Log in to your Render account** and go to the Dashboard
+3. **Click on "New" and select "Blueprint"**
+4. **Connect your GitHub account** if you haven't already
+5. **Select your forked/cloned repository**
+6. Render will detect the `render.yaml` file and suggest services to deploy
+7. **Click "Apply"** to create the services
+8. **Update the TELEGRAM_WEBHOOK_URL** in the environment variables with your actual Render app name
+   - Replace `optrixtrades-bot` in `https://optrixtrades-bot.onrender.com/telegram-webhook` with your actual app name
+9. **Fill in any remaining environment variables** marked with `sync: false` in the render.yaml file
+10. **Click "Create Services"**
+
+After deployment, follow the instructions in `DeploymentGuide.md` to register your webhook with Telegram.
 
 ## License
 

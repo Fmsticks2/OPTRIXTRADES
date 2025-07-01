@@ -40,13 +40,24 @@ const optionalVars = {
 
 // Check if .env.production exists
 const envProductionPath = path.join(__dirname, '.env.production');
+const envExamplePath = path.join(__dirname, '.env.production.example');
 const envExists = fs.existsSync(envProductionPath);
 
 console.log('=== OPTRIXTRADES Bot Deployment Preparation ===');
 
 if (!envExists) {
-  console.log('\n❌ .env.production file not found. Please create it first.\n');
-  process.exit(1);
+  console.log('\n⚠️ .env.production file not found. Creating from example template.\n');
+  
+  // Check if example file exists
+  if (fs.existsSync(envExamplePath)) {
+    // Copy example file to .env.production
+    fs.copyFileSync(envExamplePath, envProductionPath);
+    console.log('✅ Created .env.production from example template.');
+    console.log('⚠️ Please update the values in .env.production with your actual credentials.\n');
+  } else {
+    console.log('\n❌ .env.production.example file not found. Cannot create .env.production.\n');
+    process.exit(1);
+  }
 }
 
 // Read .env.production file

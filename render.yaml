@@ -1,8 +1,12 @@
+# OPTRIXTRADES Bot Render Blueprint
+# This file defines the services needed to deploy the OPTRIXTRADES bot to Render
+# For detailed deployment instructions, see RENDER_DEPLOYMENT.md
+
 services:
   - type: web
     name: optrixtrades-bot
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && node prepare-deploy.js
     startCommand: npm start
     plan: starter
     autoDeploy: true
@@ -14,9 +18,11 @@ services:
       - key: TELEGRAM_USE_WEBHOOK
         value: true
       - key: TELEGRAM_WEBHOOK_URL
-        sync: false
+        value: https://optrixtrades-bot.onrender.com/telegram-webhook
+        # Note: Replace 'optrixtrades-bot' with your actual Render app name after deployment
       - key: TELEGRAM_BOT_TOKEN
         sync: false
+        # Keep bot token as sync: false for security
       - key: ADMIN_TELEGRAM_IDS
         sync: false
       - key: PREMIUM_CHANNEL_ID
@@ -25,6 +31,7 @@ services:
         sync: false
       - key: DB_HOST
         sync: false
+        # Keep database credentials as sync: false for security
       - key: DB_PORT
         sync: false
       - key: DB_NAME
@@ -33,6 +40,7 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+        # Never commit database passwords to version control
       - key: REDIS_HOST
         sync: false
         # For Render Redis, this should be the full Redis URL (redis://red-xxxxxxxxxx:6379)
@@ -45,15 +53,17 @@ services:
         value: true
       - key: AWS_ACCESS_KEY_ID
         sync: false
+        # Keep AWS credentials as sync: false for security
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
+        # Keep AWS credentials as sync: false for security
       - key: AWS_REGION
-        sync: false
+        value: eu-north-1
       - key: AWS_S3_BUCKET
-        sync: false
+        value: optrixtrades
       - key: BROKER_API_URL
-        sync: false
+        value: https://iqoption.com/api
       - key: BROKER_WSS_URL
-        sync: false
+        value: wss://iqoption.com/echo/websocket
       - key: BROKER_AFFILIATE_LINK
-        sync: false
+        value: https://affiliate.iqbroker.com/redir/?aff=755757&aff_model=revenue&afftrack=
