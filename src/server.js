@@ -43,7 +43,12 @@ const validateTelegramWebhook = (req, res, next) => {
   }
   
   // 2. Validate IP address if not in development mode
-  if (process.env.NODE_ENV === 'production') {
+  // Skip IP validation on Render as they use internal routing (127.0.0.1)
+  const isRenderHosting = process.env.RENDER === 'true' || 
+                         process.env.IS_RENDER === 'true' || 
+                         process.env.TELEGRAM_WEBHOOK_URL?.includes('render.com');
+  
+  if (process.env.NODE_ENV === 'production' && !isRenderHosting) {
     const ip = req.ip || 
               req.connection.remoteAddress || 
               req.socket.remoteAddress || 
@@ -95,12 +100,6 @@ app.get('/health', async (req, res) => {
 
 // Telegram webhook endpoint with validation middleware
 app.post('/telegram-webhook', validateTelegramWebhook, (req, res) => {
-  // Temporary logging for webhook testing
-  console.log('=== WEBHOOK RECEIVED ===');
-  console.log('Headers:', req.headers);
-  console.log('Body:', JSON.stringify(req.body, null, 2));
-  console.log('=== END WEBHOOK ===');
-  
   // Validate that the request has the expected structure from Telegram
   if (!req.body || !req.body.update_id) {
     logger.warn('Received invalid webhook request without proper Telegram structure');
