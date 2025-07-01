@@ -6,6 +6,9 @@ const analyticsService = require('../services/analyticsService');
 const { createInlineKeyboard, createReplyKeyboard } = require('../utils/keyboard');
 const { logger, logUserAction, logAdminAction, logError } = require('../utils/logger');
 
+// Store admin states for multi-step operations
+const adminStates = new Map();
+
 /**
  * Handle admin command
  * @param {Object} msg - Telegram message object
@@ -1842,8 +1845,7 @@ const formatSubscriptionTier = (tier) => {
   }
 };
 
-// Admin states map to track multi-step processes
-const adminStates = new Map();
+// Admin states map is defined at the top of the file
 
 // Register message handler for admin commands
 bot.onText(/\/admin/, handleAdmin);

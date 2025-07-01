@@ -22,6 +22,9 @@ services:
       - key: TELEGRAM_WEBHOOK_URL
         value: https://optrixtrades-bot.onrender.com/telegram-webhook
         # Note: Replace 'optrixtrades-bot' with your actual Render app name after deployment
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+        # Secret token for webhook validation
       - key: TELEGRAM_BOT_TOKEN
         sync: false
         # Keep bot token as sync: false for security
