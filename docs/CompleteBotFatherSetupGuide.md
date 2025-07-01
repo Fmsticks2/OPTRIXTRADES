@@ -204,7 +204,7 @@ app.post(`/bot${token}`, (req, res) => {
 });
 
 // Start Express server
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 8080, () => {
   console.log('Webhook server started');
 });
 ```
@@ -228,7 +228,7 @@ USE_POLLING=true
 # For webhook:
 USE_POLLING=false
 WEBHOOK_URL=https://yourdomain.com
-PORT=3000
+PORT=8080
 
 # Database Configuration
 DB_HOST=localhost

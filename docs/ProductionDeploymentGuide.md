@@ -146,7 +146,7 @@ AWS_REGION=us-east-1
 AWS_BUCKET_NAME=optrixtrades-files
 
 # Server Configuration
-PORT=3000
+PORT=8080
 NODE_ENV=production
 LOG_LEVEL=info
 ```
@@ -222,7 +222,7 @@ server {
     
     # Bot Webhook
     location /bot {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -235,7 +235,7 @@ server {
     
     # Health Check Endpoint
     location /health {
-        proxy_pass http://localhost:3000/health;
+        proxy_pass http://localhost:8080/health;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

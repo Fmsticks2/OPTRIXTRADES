@@ -60,7 +60,7 @@ server {
     ssl_certificate_key /path/to/privkey.pem;
 
     location /bot {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -80,8 +80,8 @@ server {
     SSLCertificateFile /path/to/fullchain.pem
     SSLCertificateKeyFile /path/to/privkey.pem
     
-    ProxyPass /bot http://localhost:3000
-    ProxyPassReverse /bot http://localhost:3000
+    ProxyPass /bot http://localhost:8080
+    ProxyPassReverse /bot http://localhost:8080
 </VirtualHost>
 ```
 
@@ -98,7 +98,7 @@ const logger = require('../utils/logger');
 // Get configuration from environment variables
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Determine if we're in production mode
 const isProduction = process.env.NODE_ENV === 'production';
@@ -146,7 +146,7 @@ app.use(bodyParser.json());
 
 // Get configuration from environment variables
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const isProduction = process.env.NODE_ENV === 'production';
 
 if (isProduction) {

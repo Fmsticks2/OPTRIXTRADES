@@ -155,7 +155,7 @@ BROKER_WSS_URL=your_broker_wss_url
 BROKER_AFFILIATE_LINK=your_broker_affiliate_link
 
 # Server Configuration
-PORT=3000
+PORT=8080
 ```
 
 ### Troubleshooting

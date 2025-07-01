@@ -194,7 +194,7 @@ AWS_REGION=us-east-1
 AWS_BUCKET_NAME=optrixtrades-files
 
 # Server Configuration
-PORT=3000
+PORT=8080
 NODE_ENV=development
 ```
 

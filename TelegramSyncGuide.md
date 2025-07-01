@@ -56,7 +56,7 @@ app.post('/telegram-webhook', (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
 });
@@ -92,7 +92,7 @@ const brokerAffiliateLink = process.env.BROKER_AFFILIATE_LINK;
 let bot;
 if (config.telegram.useWebhook && config.telegram.webhookUrl) {
   // Webhook mode
-  bot = new TelegramBot(botToken, { webHook: { port: process.env.PORT || 3000 } });
+  bot = new TelegramBot(botToken, { webHook: { port: process.env.PORT || 8080 } });
   
   // Set webhook
   bot.setWebHook(config.telegram.webhookUrl);
@@ -236,7 +236,7 @@ server {
     ssl_certificate_key /path/to/privkey.pem;
 
     location /telegram-webhook {
-        proxy_pass http://localhost:3000/telegram-webhook;
+        proxy_pass http://localhost:8080/telegram-webhook;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -248,10 +248,10 @@ server {
 
 2. **Docker Deployment**:
 
-If using Docker, ensure port 3000 is exposed:
+If using Docker, ensure port 8080 is exposed:
 
 ```dockerfile
-EXPOSE 3000
+EXPOSE 8080
 ```
 
 ## Webhook Security

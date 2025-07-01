@@ -59,7 +59,7 @@ app.post('/telegram-webhook', (req, res) => {
 });
 
 // Get port from environment variable or use default
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Start the server with error handling
 logger.info(`Attempting to start Express server on port ${PORT}...`);
@@ -104,7 +104,7 @@ const startServer = (port) => {
       
       if (error.code === 'EADDRINUSE') {
         logger.error(`CRITICAL: Port ${port} is already in use. This is likely because another instance is running or the port is reserved.`);
-        logger.error(`On Render, make sure the PORT environment variable is set to 3000 in your render.yaml file.`);
+        logger.error(`On Render, make sure the PORT environment variable is set to 8080 in your render.yaml file.`);
       } else {
         logger.error('CRITICAL: Server error:', error);
       }

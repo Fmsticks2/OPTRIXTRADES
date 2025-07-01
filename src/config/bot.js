@@ -40,7 +40,7 @@ if (isTestMode) {
   };
 } else if (useWebhook && webhookUrl) {
   // Webhook mode
-  bot = new TelegramBot(botToken, { webHook: { port: process.env.PORT || 3000 } });
+  bot = new TelegramBot(botToken, { webHook: { port: process.env.PORT || 8080 } });
   
   // Set webhook
   bot.setWebHook(webhookUrl)
