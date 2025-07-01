@@ -27,10 +27,15 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
       password: password,
       db: 0,
       retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000);
+        // Exponential backoff with max 30 seconds
+        const delay = Math.min(Math.min(times * 100, 3000), 30000);
+        logger.info(`Redis retry attempt ${times} with delay ${delay}ms`);
         return delay;
       },
-      maxRetriesPerRequest: 20
+      maxRetriesPerRequest: 5,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      connectTimeout: 10000
     };
     
     logger.info(`Jobs Redis config: host=${redisUrl.hostname}, port=${redisConfig.port}`);
@@ -56,10 +61,15 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     password: process.env.REDIS_PASSWORD || '',
     db: 0,
     retryStrategy: (times) => {
-      const delay = Math.min(times * 50, 2000);
+      // Exponential backoff with max 30 seconds
+      const delay = Math.min(Math.min(times * 100, 3000), 30000);
+      logger.info(`Redis retry attempt ${times} with delay ${delay}ms`);
       return delay;
     },
-    maxRetriesPerRequest: 20
+    maxRetriesPerRequest: 5,
+    enableReadyCheck: true,
+    enableOfflineQueue: true,
+    connectTimeout: 10000
   };
   
   logger.info(`Jobs Redis config: host=${process.env.REDIS_HOST}, port=${redisConfig.port}`);
@@ -258,26 +268,56 @@ const scheduleAnalyticsReport = async (reportType) => {
 
 /**
  * Initialize all scheduled jobs
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} - True if jobs were initialized successfully
  */
 const initializeScheduledJobs = async () => {
   try {
-    // Clear existing repeatable jobs
-    await followUpQueue.removeRepeatable({ jobId: 'process_pending_follow_ups' });
-    await analyticsQueue.removeRepeatable({ jobId: 'generate_daily_report' });
-    await analyticsQueue.removeRepeatable({ jobId: 'generate_weekly_report' });
-    await analyticsQueue.removeRepeatable({ jobId: 'generate_monthly_report' });
+    // Check Redis connection first
+    const pingResult = await redisClient.ping().timeout(5000).catch(err => {
+      logger.error('Redis ping failed during job initialization:', err.message);
+      return null;
+    });
     
-    // Schedule jobs
-    await schedulePendingFollowUpsJob(15); // Check pending follow-ups every 15 minutes
-    await scheduleAnalyticsReport('daily');
-    await scheduleAnalyticsReport('weekly');
-    await scheduleAnalyticsReport('monthly');
+    if (pingResult !== 'PONG') {
+      logger.error('Redis connection check failed - cannot initialize jobs');
+      return false;
+    }
     
-    logger.info('All scheduled jobs initialized');
+    logger.info('Redis connection verified, initializing scheduled jobs');
+    
+    // Clear existing repeatable jobs with error handling
+    try {
+      await followUpQueue.removeRepeatable({ jobId: 'process_pending_follow_ups' });
+      await analyticsQueue.removeRepeatable({ jobId: 'generate_daily_report' });
+      await analyticsQueue.removeRepeatable({ jobId: 'generate_weekly_report' });
+      await analyticsQueue.removeRepeatable({ jobId: 'generate_monthly_report' });
+    } catch (clearError) {
+      logger.warn('Error clearing existing jobs, continuing with initialization:', clearError.message);
+    }
+    
+    // Schedule jobs with individual error handling
+    const jobResults = await Promise.allSettled([
+      schedulePendingFollowUpsJob(15), // Check pending follow-ups every 15 minutes
+      scheduleAnalyticsReport('daily'),
+      scheduleAnalyticsReport('weekly'),
+      scheduleAnalyticsReport('monthly')
+    ]);
+    
+    // Check results
+    const failedJobs = jobResults.filter(result => result.status === 'rejected');
+    if (failedJobs.length > 0) {
+      logger.warn(`${failedJobs.length} out of ${jobResults.length} jobs failed to initialize`);
+      failedJobs.forEach((job, index) => {
+        logger.error(`Failed job ${index + 1}:`, job.reason);
+      });
+    }
+    
+    logger.info(`Scheduled jobs initialized: ${jobResults.length - failedJobs.length} successful, ${failedJobs.length} failed`);
+    return true;
   } catch (error) {
     logError('system', 'initializeScheduledJobs', error);
-    throw error;
+    logger.error('Failed to initialize scheduled jobs:', error.message);
+    return false;
   }
 };
 

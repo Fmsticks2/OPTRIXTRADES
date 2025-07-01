@@ -46,11 +46,14 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
       password: password,
       retryStrategy: (times) => {
         // Exponential backoff with max 30 seconds
-        const delay = Math.min(times * 50, 30000);
+        const delay = Math.min(Math.min(times * 100, 3000), 30000);
+        logger.info(`Redis retry attempt ${times} with delay ${delay}ms`);
         return delay;
       },
-      maxRetriesPerRequest: 20,
-      enableOfflineQueue: false
+      maxRetriesPerRequest: 5,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      connectTimeout: 10000
     };
     
     logger.info(`Redis config created: host=${redisUrl.hostname}, port=${redisConfig.port}`);
@@ -68,11 +71,14 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     password: process.env.REDIS_PASSWORD || undefined, // Only set if not empty
     retryStrategy: (times) => {
       // Exponential backoff with max 30 seconds
-      const delay = Math.min(times * 50, 30000);
+      const delay = Math.min(Math.min(times * 100, 3000), 30000);
+      logger.info(`Redis retry attempt ${times} with delay ${delay}ms`);
       return delay;
     },
-    maxRetriesPerRequest: 20,
-    enableOfflineQueue: false
+    maxRetriesPerRequest: 5,
+    enableReadyCheck: true,
+    enableOfflineQueue: true,
+    connectTimeout: 10000
   };
   
   logger.info(`Redis config created: host=${process.env.REDIS_HOST}, port=${redisConfig.port}`);

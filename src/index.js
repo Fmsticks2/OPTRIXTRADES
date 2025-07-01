@@ -35,10 +35,14 @@ async function initializeBot() {
       logger.warn('Database initialization error - continuing without database:', dbError.message);
     }
     
-    // Initialize scheduled jobs (skip if there's an error)
+    // Initialize scheduled jobs
     try {
-      await initializeScheduledJobs();
-      logger.info('Scheduled jobs initialized successfully');
+      const jobsInitialized = await initializeScheduledJobs();
+      if (jobsInitialized) {
+        logger.info('Scheduled jobs initialized successfully');
+      } else {
+        logger.warn('Scheduled jobs initialization failed - continuing without jobs');
+      }
     } catch (jobsError) {
       logger.warn('Scheduled jobs initialization error - continuing without jobs:', jobsError.message);
     }

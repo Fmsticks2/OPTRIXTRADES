@@ -31,7 +31,7 @@ const handleAdmin = async (msg) => {
     logAdminAction(telegramId, 'command_admin');
     
     // Get user statistics
-    const stats = await adminService.getUserStatistics();
+    const stats = await adminService.getUserStatistics(telegramId);
     
     // Format message
     let message = `*OPTRIXTRADES Admin Panel*\n\n` +
