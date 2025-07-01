@@ -1,0 +1,59 @@
+services:
+  - type: web
+    name: optrixtrades-bot
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: starter
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: TELEGRAM_USE_WEBHOOK
+        value: true
+      - key: TELEGRAM_WEBHOOK_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: ADMIN_TELEGRAM_IDS
+        sync: false
+      - key: PREMIUM_CHANNEL_ID
+        sync: false
+      - key: VIP_CHANNEL_ID
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+        # For Render Redis, this should be the full Redis URL (redis://red-xxxxxxxxxx:6379)
+      # REDIS_PORT and REDIS_PASSWORD are not needed when using Redis URL
+      # - key: REDIS_PORT
+      #   sync: false
+      # - key: REDIS_PASSWORD
+      #   sync: false
+      - key: USE_REDIS
+        value: true
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: BROKER_API_URL
+        sync: false
+      - key: BROKER_WSS_URL
+        sync: false
+      - key: BROKER_AFFILIATE_LINK
+        sync: false
