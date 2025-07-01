@@ -1,5 +1,5 @@
 /**
- * Message templates for the 10-day follow-up sequence
+ * Message templates for the 10-day follow-up sequence and other bot messages
  */
 
 /**
@@ -166,9 +166,57 @@ const getVerificationTemplate = (userData) => {
   };
 };
 
+/**
+ * Get welcome message for new users
+ * @param {string} firstName - User's first name
+ * @returns {string} - Welcome message
+ */
+const getWelcomeMessage = (firstName) => {
+  return `Welcome to OPTRIXTRADES, ${firstName || 'there'}! 🚀
+
+We're excited to have you join our trading community. Here's what you can look forward to:
+
+💎 VIP Trading Signals
+📊 6-Figure Trader Strategies
+👥 Private Trading Community
+💰 Signup Bonuses up to $500
+🤖 Automated Trading Bot
+
+Ready to get started?`;
+};
+
+/**
+ * Get registration instructions for users
+ * @param {Object} userData - User data including first_name and affiliate_link
+ * @returns {string} - Registration instructions
+ */
+const getRegistrationInstructions = (userData) => {
+  const firstName = userData.first_name || 'there';
+  const affiliateLink = userData.affiliate_link || 'https://broker.example.com/register';
+  
+  return `Great choice, ${firstName}! 🌟
+
+Here's your 3-step activation process:
+
+1️⃣ Register with our broker partner using this link:
+${affiliateLink}
+
+2️⃣ Deposit $20 or more
+
+3️⃣ Send me your UID and a screenshot of your deposit
+
+💰 BONUS TIERS:
+• $100+: Full OPTRIX Web AI Portal access
+• $500+: All signal options, VIP telegram group, private sessions, AI Auto-Trading
+
+We earn commissions from the broker, not from your money - that's how we provide this service for free!`;
+};
+
 module.exports = {
   getFollowUpTemplate,
   getWelcomeTemplate,
   getRegistrationTemplate,
-  getVerificationTemplate
+  getVerificationTemplate,
+  getWelcomeMessage,
+  getRegistrationInstructions
 };
