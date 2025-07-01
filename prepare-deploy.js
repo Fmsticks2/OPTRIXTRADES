@@ -30,7 +30,7 @@ const requiredVars = [
 
 // Optional environment variables with defaults
 const optionalVars = {
-  'PORT': '3000',
+  'PORT': '10000',
   'NODE_ENV': 'production',
   'TELEGRAM_USE_WEBHOOK': 'true',
   'DB_PORT': '5432',

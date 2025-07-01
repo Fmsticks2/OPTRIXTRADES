@@ -14,7 +14,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3002
+        value: 10000
       - key: TELEGRAM_USE_WEBHOOK
         value: true
       - key: TELEGRAM_WEBHOOK_URL

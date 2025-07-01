@@ -197,7 +197,7 @@ BROKER_WSS_URL=wss://iqoption.com/echo/websocket
 BROKER_AFFILIATE_LINK=https://affiliate.iqbroker.com/redir/?aff=755757&aff_model=revenue&afftrack=
 
 # Server Configuration
-PORT=3000
+PORT=10000
 
 # Logging Configuration
 # Set to 'false' in environments where file system writes are restricted (like Render)
@@ -238,12 +238,12 @@ CAN_WRITE_LOGS=false
 
 ### Port Already in Use (EADDRINUSE)
 
-If you see an error like `listen EADDRINUSE: address already in use 0.0.0.0:3000`:
+If you see an error like `listen EADDRINUSE: address already in use 0.0.0.0:10000`:
 
 1. This typically happens when multiple instances of your app are trying to start on the same port
 2. In your Render dashboard, go to your service and check if there are multiple instances running
 3. Try restarting the service completely (not just redeploying)
-4. If the issue persists, consider changing the port in your environment variables to something other than 3000
+4. If the issue persists, consider changing the port in your environment variables to something other than 10000
 
 ### Logging Issues
 

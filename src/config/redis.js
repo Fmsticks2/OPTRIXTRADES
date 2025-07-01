@@ -80,6 +80,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
 
 // Create Redis client or mock client
 let redisClient;
+let usingMockRedis = false;
 
 if (useRedis) {
   try {
@@ -92,13 +93,40 @@ if (useRedis) {
     
     redisClient.on('error', (err) => {
       logger.error('Redis client error:', err.message);
+      
+      // Check if this is a connection error (ENOTFOUND, ECONNREFUSED, etc.)
+      if (err.code && (
+          err.code === 'ENOTFOUND' || 
+          err.code === 'ECONNREFUSED' || 
+          err.code === 'ETIMEDOUT' ||
+          err.message.includes('getaddrinfo')
+        )) {
+        // Only switch to mock client if we haven't already
+        if (!usingMockRedis) {
+          logger.warn('Persistent Redis connection errors detected. Switching to mock Redis client...');
+          redisClient = createMockRedisClient();
+          usingMockRedis = true;
+        }
+      }
+    });
+    
+    // Add reconnect event handler
+    redisClient.on('reconnecting', () => {
+      logger.info('Redis client attempting to reconnect...');
+    });
+    
+    // Add ready event handler
+    redisClient.on('ready', () => {
+      logger.info('Redis client ready and accepting commands');
     });
   } catch (error) {
     logger.error('Failed to initialize Redis client:', error.message);
     redisClient = createMockRedisClient();
+    usingMockRedis = true;
   }
 } else {
   redisClient = createMockRedisClient();
+  usingMockRedis = true;
 }
 
 module.exports = {

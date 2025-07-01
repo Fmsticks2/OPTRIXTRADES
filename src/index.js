@@ -114,6 +114,13 @@ initializeBot();
 
 // If using webhook mode, also require the server
 if (useWebhook) {
-  const { server: expressServer } = require('./server');
-  server = expressServer; // Store server reference for graceful shutdown
+  try {
+    logger.info('Starting Express server for webhook mode...');
+    const { server: expressServer } = require('./server');
+    server = expressServer; // Store server reference for graceful shutdown
+    logger.info('Express server module loaded successfully');
+  } catch (error) {
+    logger.error('Failed to start Express server:', error);
+    logger.warn('Bot will continue running without webhook server');
+  }
 }
