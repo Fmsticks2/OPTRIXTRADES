@@ -13,13 +13,13 @@ This document outlines the user flows implemented in the OPTRIXTRADES Telegram b
 2. **Registration**
    - User provides necessary information (handled by welcomeController.js)
    - System creates a new user record in the database
-   - User is assigned a "Basic" subscription tier by default
+   - User is assigned a "Free" subscription tier by default
 
 ## Verification Process (Current Implementation)
 
 1. **Initiating Verification**
    - User selects "Verify Account" option from account menu or verification prompt
-   - Bot explains verification requirements (deposit screenshot showing at least $100 for Premium or $1,000 for VIP)
+   - Bot explains verification requirements (deposit screenshot showing at least $20 for Basic, $100 for Premium, or $500 for VIP)
    - User is guided to the verification process (handled by verificationController.js)
 
 2. **Submission Process**
@@ -35,38 +35,61 @@ This document outlines the user flows implemented in the OPTRIXTRADES Telegram b
      - View user details
      - View the submitted broker UID
      - View the deposit screenshot
-     - Approve as Premium (for deposits $100-$999)
-     - Approve as VIP (for deposits $1,000+)
+     - Approve as Basic (for deposits $20-$99)
+     - Approve as Premium (for deposits $100-$499)
+     - Approve as VIP (for deposits $500+)
      - Reject with a reason
 
 4. **Verification Outcome**
    - If approved:
      - User's verification status is updated to "verified"
-     - User's subscription tier is updated to Premium or VIP based on deposit amount
+     - User's subscription tier is updated based on deposit amount:
+       - $20-$99: Basic tier
+       - $100-$499: Premium tier
+       - $500+: VIP tier
      - User receives notification of successful verification
      - User gains access to tier-specific features
    - If rejected:
      - Verification status remains "unverified"
+     - User's subscription tier remains "Free"
      - User receives notification with rejection reason
      - User can submit a new verification request
 
 ## Subscription Tiers and Features
 
-1. **Basic (Unverified)**
-   - Access to basic trading signals
-   - Limited access to support
-   - Cannot use auto-trading features
+1. **Free**
+   - **Eligibility**: All registered users
+   - **Deposit Requirement**: None
+   - **Features**:
+     - Limited access to bot features
 
-2. **Premium (Verified with $100-$999)**
-   - Access to all trading signals
-   - Priority support
-   - Cannot use auto-trading features
+2. **Basic**
+   - **Eligibility**: Users who have completed verification with deposits between $20-$99
+   - **Deposit Requirement**: $20 minimum
+   - **Features**:
+     - Basic trading signals
+     - Market updates
+     - Basic bot functions
 
-3. **VIP (Verified with $1,000+)**
-   - Access to all trading signals
-   - Priority support
-   - Access to auto-trading features
-   - Exclusive VIP-only signals
+3. **Premium**
+   - **Eligibility**: Users who have completed verification with deposits between $100-$499
+   - **Deposit Requirement**: $100 minimum
+   - **Features**:
+     - Premium trading signals
+     - Market analysis
+     - Priority support
+     - Enhanced bot functions
+
+4. **VIP**
+   - **Eligibility**: Users who have completed verification with deposits of $500 or more
+   - **Deposit Requirement**: $500 minimum
+   - **Features**:
+     - VIP trading signals
+     - One-on-one consultations
+     - Exclusive webinars
+     - Custom risk management
+     - Full access to all bot functions and tools
+     - AI Auto-Trading
 
 ## Account Management
 
@@ -85,7 +108,8 @@ This document outlines the user flows implemented in the OPTRIXTRADES Telegram b
    - Users can toggle notification preferences
 
 3. **Upgrading Subscription**
-   - Users can request to upgrade from Basic to Premium/VIP
+   - Users can request to upgrade from Free to Basic/Premium/VIP
+   - Basic users can upgrade to Premium/VIP
    - Premium users can upgrade to VIP
    - Upgrade requires new verification with appropriate deposit amount
 
@@ -96,8 +120,9 @@ This document outlines the user flows implemented in the OPTRIXTRADES Telegram b
    - Signal notifications can be toggled on/off
 
 2. **Auto-Trading (VIP Only)**
-   - VIP users can enable/disable auto-trading
+   - VIP users can enable/disable AI Auto-Trading
    - Auto-trade notifications can be toggled on/off
+   - Custom risk management settings available
 
 ## Support System
 
@@ -173,5 +198,7 @@ This document outlines the user flows implemented in the OPTRIXTRADES Telegram b
 1. Enhance verification process with automated validation
 2. Implement verification expiry and renewal process
 3. Add more detailed analytics for verification conversion rates
-4. Improve user experience during verification waiting period
-5. Implement verification appeal process for rejected submissions
+4. Implement automatic tier upgrades based on deposit increases
+5. Develop personalized feature recommendations based on user tier and activity
+6. Improve user experience during verification waiting period
+7. Implement verification appeal process for rejected submissions
