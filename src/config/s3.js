@@ -1,15 +1,15 @@
 require('dotenv').config();
-const AWS = require('aws-sdk');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // AWS S3 configuration from environment variables
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
 });
-
-// Create S3 instance
-const s3 = new AWS.S3();
 
 // S3 bucket name
 const bucketName = process.env.AWS_S3_BUCKET;
@@ -31,9 +31,13 @@ const uploadToS3 = async (fileBuffer, fileName, contentType) => {
       ACL: 'private' // Use private access for security
     };
 
-    const uploadResult = await s3.upload(params).promise();
-    console.log('File uploaded successfully to S3:', uploadResult.Location);
-    return uploadResult.Location;
+    const command = new PutObjectCommand(params);
+    const uploadResult = await s3Client.send(command);
+    
+    // Construct the URL since SDK v3 doesn't return Location directly
+    const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    console.log('File uploaded successfully to S3:', fileUrl);
+    return fileUrl;
   } catch (error) {
     console.error('Error uploading file to S3:', error);
     throw error;
@@ -44,21 +48,21 @@ const uploadToS3 = async (fileBuffer, fileName, contentType) => {
  * Generate a pre-signed URL for temporary access to a private S3 object
  * @param {string} key - S3 object key
  * @param {number} expirySeconds - URL expiry time in seconds
- * @returns {string} - Pre-signed URL
+ * @returns {Promise<string>} - Pre-signed URL
  */
-const getSignedUrl = (key, expirySeconds = 3600) => {
+const generateSignedUrl = async (key, expirySeconds = 3600) => {
   const params = {
     Bucket: bucketName,
-    Key: key,
-    Expires: expirySeconds
+    Key: key
   };
 
-  return s3.getSignedUrl('getObject', params);
+  const command = new GetObjectCommand(params);
+  return await getSignedUrl(s3Client, command, { expiresIn: expirySeconds });
 };
 
 module.exports = {
-  s3,
+  s3Client,
   bucketName,
   uploadToS3,
-  getSignedUrl
+  getSignedUrl: generateSignedUrl
 };

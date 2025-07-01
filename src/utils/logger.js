@@ -71,7 +71,8 @@ const logger = winston.createLogger({
     new winston.transports.File({ 
       filename: path.join(logDir, 'exceptions.log') 
     })
-  ] : []
+  ] : [],
+  exitOnError: false // Prevent Winston from exiting on uncaught exceptions
 });
 
 /**

@@ -70,10 +70,50 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled rejection at:', promise, 'reason:', reason);
 });
 
+// Add graceful shutdown handling
+let server;
+const gracefulShutdown = () => {
+  logger.info('Received shutdown signal, closing server and connections...');
+  
+  // Stop the bot if it's running
+  if (bot) {
+    try {
+      if (!useWebhook) {
+        bot.stopPolling();
+      }
+      logger.info('Bot stopped successfully');
+    } catch (error) {
+      logger.error('Error stopping bot:', error);
+    }
+  }
+  
+  // Close the server if it's running
+  if (server) {
+    try {
+      server.close(() => {
+        logger.info('Express server closed successfully');
+      });
+    } catch (error) {
+      logger.error('Error closing server:', error);
+    }
+  }
+  
+  // Allow some time for cleanup before exiting
+  setTimeout(() => {
+    logger.info('Exiting process...');
+    process.exit(0);
+  }, 1000);
+};
+
+// Listen for termination signals
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
 // Initialize the bot
 initializeBot();
 
 // If using webhook mode, also require the server
 if (useWebhook) {
-  require('./server');
+  const { server: expressServer } = require('./server');
+  server = expressServer; // Store server reference for graceful shutdown
 }

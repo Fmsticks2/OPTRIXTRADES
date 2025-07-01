@@ -61,11 +61,24 @@ app.post('/telegram-webhook', (req, res) => {
 // Get port from environment variable or use default
 const PORT = process.env.PORT || 3000;
 
-// Start the server
-app.listen(PORT, () => {
+// Start the server with error handling
+const server = app.listen(PORT, () => {
   logger.info(`Express server listening on port ${PORT}`);
   logger.info(`Webhook endpoint: http://localhost:${PORT}/telegram-webhook`);
   logger.info(`Health check endpoint: http://localhost:${PORT}/health`);
 });
 
-module.exports = app;
+// Add error handling for the server
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    logger.error(`Port ${PORT} is already in use. Please use a different port or stop the other process.`);
+    // You could automatically try another port here
+    // const newPort = PORT + 1;
+    // logger.info(`Attempting to use port ${newPort} instead...`);
+    // server.listen(newPort);
+  } else {
+    logger.error('Server error:', error);
+  }
+});
+
+module.exports = { app, server };
