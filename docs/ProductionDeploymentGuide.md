@@ -149,7 +149,10 @@ AWS_BUCKET_NAME=optrixtrades-files
 PORT=8080
 NODE_ENV=production
 LOG_LEVEL=info
+IS_RENDER=true
 ```
+
+> **IMPORTANT**: For security reasons, `.env` and `.env.production` files are excluded from Git via `.gitignore`. Never commit these files to your repository as they contain sensitive information. For detailed instructions on managing environment variables, see `docs/EnvironmentVariablesGuide.md`.
 
 ## Database Setup
 

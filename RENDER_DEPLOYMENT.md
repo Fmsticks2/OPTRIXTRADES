@@ -131,3 +131,4 @@ To verify that your webhook is properly set up:
 - [Render Documentation](https://render.com/docs)
 - [Telegram Bot API Documentation](https://core.telegram.org/bots/api)
 - See the `DeploymentGuide.md` for more detailed deployment instructions
+- See the `docs/EnvironmentVariablesGuide.md` for detailed instructions on managing environment variables

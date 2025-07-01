@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+.env.production
 .env.local
 .env.development.local
 .env.test.local
@@ -61,7 +62,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# Already included in Environment variables section above
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

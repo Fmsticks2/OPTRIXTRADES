@@ -166,7 +166,12 @@ console.log(`${canWriteLogs === 'false' ? '✅' : '⚠️'} Logging configuratio
 console.log('\n=== Next Steps ===');
 console.log('1. Commit your changes (excluding .env files)');
 console.log('2. Push to your repository');
-console.log('3. Deploy to Render using the instructions in DeploymentGuide.md');
+console.log('3. Set up environment variables in Render dashboard');
+console.log('4. Deploy to Render using the instructions in DeploymentGuide.md');
+console.log('5. Refer to docs/EnvironmentVariablesGuide.md for detailed instructions on environment variables');
+
+console.log('\nReminder: .env and .env.production files are excluded from Git for security reasons.');
+console.log('You will need to manually configure environment variables in the Render dashboard.');
 
 console.log('\nGood luck with your deployment! 🚀\n');
 

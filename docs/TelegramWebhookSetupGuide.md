@@ -125,6 +125,16 @@ The OPTRIXTRADES bot is currently configured with the following webhook:
 
 This webhook is properly configured and receiving updates from Telegram.
 
+### Render-Specific Configuration
+
+When deploying to Render, you need to set the `IS_RENDER=true` environment variable. This is important because:
+
+1. Render's internal routing causes webhook requests to appear from `127.0.0.1` instead of Telegram's IP ranges
+2. Setting `IS_RENDER=true` allows the application to bypass IP validation for Render hosting
+3. The webhook will still validate the secret token for security
+
+> **Note**: For security reasons, `.env` and `.env.production` files are excluded from Git via `.gitignore`. Never commit these files to your repository. For detailed instructions on managing environment variables, see `docs/EnvironmentVariablesGuide.md`.
+
 ## Redis Connection Issues
 
 If you see errors like this in your logs:
