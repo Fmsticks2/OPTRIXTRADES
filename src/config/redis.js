@@ -49,7 +49,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
         const delay = Math.min(times * 50, 30000);
         return delay;
       },
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: 20,
       enableOfflineQueue: false
     };
     
@@ -71,7 +71,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
       const delay = Math.min(times * 50, 30000);
       return delay;
     },
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: 20,
     enableOfflineQueue: false
   };
   

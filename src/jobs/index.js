@@ -29,7 +29,8 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
       retryStrategy: (times) => {
         const delay = Math.min(times * 50, 2000);
         return delay;
-      }
+      },
+      maxRetriesPerRequest: 20
     };
     
     logger.info(`Jobs Redis config: host=${redisUrl.hostname}, port=${redisConfig.port}`);
@@ -57,7 +58,8 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     retryStrategy: (times) => {
       const delay = Math.min(times * 50, 2000);
       return delay;
-    }
+    },
+    maxRetriesPerRequest: 20
   };
   
   logger.info(`Jobs Redis config: host=${process.env.REDIS_HOST}, port=${redisConfig.port}`);
