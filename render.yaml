@@ -43,7 +43,7 @@ services:
         # Never commit database passwords to version control
       - key: REDIS_HOST
         sync: false
-        # For Render Redis, this should be the full Redis URL (redis://red-xxxxxxxxxx:6379)
+        # For Render Redis, this should be the full Redis URL (redis://red-d1hroc3uibrs73fqp9k0:6379)
       # REDIS_PORT and REDIS_PASSWORD are not needed when using Redis URL
       # - key: REDIS_PORT
       #   sync: false

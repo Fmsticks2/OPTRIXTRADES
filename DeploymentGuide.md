@@ -61,7 +61,7 @@ You have two options for Redis:
    - Name: `optrixtrades-redis`
    - Create a secure password (optional)
 3. Click "Create Redis"
-4. Once created, Render will provide a Redis URL in the format `redis://red-xxxxxxxxxx:6379`
+4. Once created, Render will provide a Redis URL in the format `redis://red-d1hroc3uibrs73fqp9k0:6379`
 5. Copy this entire URL and use it as the `REDIS_HOST` value in your environment variables
 6. You don't need to set `REDIS_PORT` or `REDIS_PASSWORD` separately when using the Redis URL
 
@@ -137,7 +137,7 @@ NODE_ENV=production
 
 # Redis Configuration
 # For Render Redis, use the full URL provided by Render
-REDIS_HOST=redis://red-xxxxxxxxxx:6379
+REDIS_HOST=redis://red-d1hroc3uibrs73fqp9k0:6379
 # REDIS_PORT and REDIS_PASSWORD are not needed when using a Redis URL
 # REDIS_PORT=6379
 # REDIS_PASSWORD=your_redis_password
@@ -172,10 +172,10 @@ PORT=3000
 
 3. **Redis connection issues**:
    - When using Render's Redis, make sure you're using the full Redis URL in the `REDIS_HOST` variable
-   - The URL should look like `redis://red-xxxxxxxxxx:6379`
+   - The URL should look like `redis://red-d1hroc3uibrs73fqp9k0:6379`
    - The application has been updated to properly parse Redis URLs in all services (main Redis client, queue service, and jobs service), but if you encounter issues, you can try these alternatives:
        - Option 1: Keep using `REDIS_HOST` with the full URL (recommended)
-       - Option 2: Set `REDIS_HOST` to just the hostname (e.g., `red-xxxxxxxxxx`) and set `REDIS_PORT=6379` separately
+       - Option 2: Set `REDIS_HOST` to just the hostname (e.g., `red-d1hroc3uibrs73fqp9k0`) and set `REDIS_PORT=6379` separately
    - Ensure Redis is accessible from your web service (they should be in the same region)
    - If Redis is optional for your application, you can set `USE_REDIS=false` to use the mock Redis client
 

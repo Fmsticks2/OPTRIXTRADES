@@ -107,10 +107,10 @@ To verify that your webhook is properly set up:
 ### Redis Connection Issues
 
 1. When using Render's Redis, make sure you're using the full Redis URL in the `REDIS_HOST` variable
-2. The URL should look like `redis://red-xxxxxxxxxx:6379`
+2. The URL should look like `redis://red-d1hroc3uibrs73fqp9k0:6379`
 3. The application has been updated to properly parse Redis URLs in all services (main Redis client, queue service, and jobs service), but if you encounter issues, you can try these alternatives:
    - Option 1: Keep using `REDIS_HOST` with the full URL (recommended)
-   - Option 2: Set `REDIS_HOST` to just the hostname (e.g., `red-xxxxxxxxxx`) and set `REDIS_PORT=6379` separately
+   - Option 2: Set `REDIS_HOST` to just the hostname (e.g., `red-d1hroc3uibrs73fqp9k0`) and set `REDIS_PORT=6379` separately
 4. Ensure Redis is accessible from your web service (they should be in the same region)
 5. If Redis is optional for your application, you can set `USE_REDIS=false` to use the mock Redis client
 
