@@ -19,6 +19,7 @@ const brokerAffiliateLink = process.env.BROKER_AFFILIATE_LINK;
 // Webhook configuration
 const useWebhook = process.env.TELEGRAM_USE_WEBHOOK === 'true';
 const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
+const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
 
 // Create bot instance with appropriate options
 let bot;
@@ -42,9 +43,16 @@ if (isTestMode) {
   // Webhook mode - without starting a server
   bot = new TelegramBot(botToken, { webHook: false });
   
-  // Set webhook
-  bot.setWebHook(webhookUrl)
-    .then(() => console.log(`Webhook set to: ${webhookUrl}`))
+  // Set webhook with secret token if available
+  const webhookOptions = webhookSecret ? { secret_token: webhookSecret } : {};
+  
+  bot.setWebHook(webhookUrl, webhookOptions)
+    .then(() => {
+      console.log(`Webhook set to: ${webhookUrl}`);
+      if (webhookSecret) {
+        console.log('Webhook secret token configured for enhanced security');
+      }
+    })
     .catch(err => console.error(`Failed to set webhook: ${err.message}`));
 } else {
   // Polling mode

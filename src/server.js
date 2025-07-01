@@ -11,6 +11,55 @@ const { bot } = require('./config/bot');
 const { config } = require('./config/appConfig');
 const { logger } = require('./utils/logger');
 
+// Telegram IP ranges for webhook security
+// These are the IP ranges that Telegram uses for webhook requests
+// Source: https://core.telegram.org/bots/webhooks#the-short-version
+const TELEGRAM_IP_RANGES = [
+  '149.154.160.0/20',
+  '91.108.4.0/22'
+];
+
+// Helper function to check if an IP is in a CIDR range
+const ipInRange = (ip, cidr) => {
+  const [range, bits = 32] = cidr.split('/');
+  const mask = ~(2 ** (32 - bits) - 1);
+  
+  const ipInt = ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+  const rangeInt = range.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+  
+  return (ipInt & mask) === (rangeInt & mask);
+};
+
+// Middleware to validate Telegram webhook requests
+const validateTelegramWebhook = (req, res, next) => {
+  // 1. Check for secret token if configured
+  const secretToken = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (secretToken) {
+    const headerToken = req.headers['x-telegram-bot-api-secret-token'];
+    if (headerToken !== secretToken) {
+      logger.warn('Webhook request rejected: Invalid secret token');
+      return res.status(403).send('Unauthorized');
+    }
+  }
+  
+  // 2. Validate IP address if not in development mode
+  if (process.env.NODE_ENV === 'production') {
+    const ip = req.ip || 
+              req.connection.remoteAddress || 
+              req.socket.remoteAddress || 
+              req.connection.socket.remoteAddress;
+    
+    const isValidIP = TELEGRAM_IP_RANGES.some(range => ipInRange(ip, range));
+    
+    if (!isValidIP) {
+      logger.warn(`Webhook request rejected: IP not from Telegram: ${ip}`);
+      return res.status(403).send('Unauthorized');
+    }
+  }
+  
+  next();
+};
+
 // Create Express app
 const app = express();
 
@@ -44,15 +93,23 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Telegram webhook endpoint
-app.post('/telegram-webhook', (req, res) => {
-  if (req.body) {
-    // Process the update
-    bot.processUpdate(req.body);
-    logger.debug('Received webhook update from Telegram');
-  } else {
-    logger.warn('Received webhook request with no body');
+// Telegram webhook endpoint with validation middleware
+app.post('/telegram-webhook', validateTelegramWebhook, (req, res) => {
+  // Temporary logging for webhook testing
+  console.log('=== WEBHOOK RECEIVED ===');
+  console.log('Headers:', req.headers);
+  console.log('Body:', JSON.stringify(req.body, null, 2));
+  console.log('=== END WEBHOOK ===');
+  
+  // Validate that the request has the expected structure from Telegram
+  if (!req.body || !req.body.update_id) {
+    logger.warn('Received invalid webhook request without proper Telegram structure');
+    return res.status(403).send('Unauthorized');
   }
+  
+  // Process the update
+  bot.processUpdate(req.body);
+  logger.debug('Received webhook update from Telegram');
   
   // Always respond with 200 OK to Telegram
   res.sendStatus(200);
