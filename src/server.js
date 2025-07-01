@@ -80,10 +80,17 @@ const startServer = (port) => {
     const newServer = app.listen(port, () => {
       logger.info(`SUCCESS: Express server listening on port ${port}`);
       
-      // Use the configured webhook URL from environment variables if available
+      // Use the configured webhook URL from environment variables
+      // In production, TELEGRAM_WEBHOOK_URL must be set
+      if (!process.env.TELEGRAM_WEBHOOK_URL && process.env.NODE_ENV === 'production') {
+        logger.warn('TELEGRAM_WEBHOOK_URL is not set in production environment. Webhook functionality may not work correctly.');
+      }
+      
       const baseUrl = process.env.TELEGRAM_WEBHOOK_URL 
         ? new URL(process.env.TELEGRAM_WEBHOOK_URL).origin 
-        : `http://localhost:${port}`;
+        : process.env.NODE_ENV === 'production'
+          ? 'https://your-app-domain.com' // Placeholder that should be replaced with actual domain
+          : `http://localhost:${port}`;
       
       logger.info(`Webhook endpoint: ${baseUrl}/telegram-webhook`);
       logger.info(`Health check endpoint: ${baseUrl}/health`);

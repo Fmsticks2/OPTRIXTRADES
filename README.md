@@ -102,7 +102,12 @@ AWS_REGION=your_aws_region
 S3_BUCKET_NAME=your_s3_bucket_name
 
 # Redis Configuration
-REDIS_URL=redis://localhost:6379
+# For development:
+REDIS_HOST=localhost
+REDIS_PORT=6379
+# For production (Render):
+# REDIS_HOST=redis://red-xxxxxxxxxxxx:6379
+# USE_REDIS=true
 ```
 
 ### Protecting Sensitive Information

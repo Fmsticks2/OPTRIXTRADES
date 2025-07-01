@@ -36,7 +36,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     logger.error('Failed to parse Redis URL for queue:', error.message);
     // Fallback to using default options
     redisOptions = {
-      host: process.env.REDIS_HOST || 'localhost',
+      host: process.env.REDIS_HOST || (process.env.NODE_ENV === 'production' ? 'redis.example.com' : 'localhost'),
       port: parseInt(process.env.REDIS_PORT || '6379', 10),
       password: process.env.REDIS_PASSWORD || undefined
     };
@@ -44,7 +44,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
 } else {
   // Use traditional host/port/password configuration
   redisOptions = {
-    host: process.env.REDIS_HOST || 'localhost',
+    host: process.env.REDIS_HOST || (process.env.NODE_ENV === 'production' ? 'redis.example.com' : 'localhost'),
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
     password: process.env.REDIS_PASSWORD || undefined
   };

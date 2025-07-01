@@ -17,11 +17,11 @@ const isTest = NODE_ENV === 'test';
 const defaults = {
   // Server settings
   port: 10000,
-  host: 'localhost',
+  host: process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost',
   
   // Database settings
   db: {
-    host: 'localhost',
+    host: process.env.NODE_ENV === 'production' ? 'db.example.com' : 'localhost',
     port: 5432,
     database: 'optrixtrades',
     username: 'postgres',
@@ -39,7 +39,7 @@ const defaults = {
   
   // Redis settings
   redis: {
-    host: 'localhost',
+    host: process.env.NODE_ENV === 'production' ? 'redis.example.com' : 'localhost',
     port: 6379,
     password: '',
     keyPrefix: 'optrix:'

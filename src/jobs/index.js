@@ -38,7 +38,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     // Fallback to using default options
     redisConfig = {
       port: process.env.REDIS_PORT || 6379,
-      host: process.env.REDIS_HOST || 'localhost',
+      host: process.env.REDIS_HOST || (process.env.NODE_ENV === 'production' ? 'redis.example.com' : 'localhost'),
       password: process.env.REDIS_PASSWORD || '',
       db: 0,
       retryStrategy: (times) => {
@@ -51,7 +51,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
   // Use traditional host/port/password configuration
   redisConfig = {
     port: process.env.REDIS_PORT || 6379,
-    host: process.env.REDIS_HOST || 'localhost',
+    host: process.env.REDIS_HOST || (process.env.NODE_ENV === 'production' ? 'redis.example.com' : 'localhost'),
     password: process.env.REDIS_PASSWORD || '',
     db: 0,
     retryStrategy: (times) => {
