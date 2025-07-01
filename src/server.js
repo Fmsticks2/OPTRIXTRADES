@@ -61,10 +61,6 @@ app.post('/telegram-webhook', (req, res) => {
 // Get port from environment variable or use default
 const PORT = process.env.PORT || 8080;
 
-// Start the server with error handling
-logger.info(`Attempting to start Express server on port ${PORT}...`);
-let server;
-
 // Add a simple route to test if the server is running
 app.get('/', (req, res) => {
   res.send('OPTRIXTRADES Bot server is running');
@@ -73,54 +69,48 @@ app.get('/', (req, res) => {
 // Log all environment variables for debugging
 logger.info(`Environment variables: NODE_ENV=${process.env.NODE_ENV}, PORT=${PORT}`);
 
-// Function to start server on a specific port
-const startServer = (port) => {
-  try {
-    logger.info(`Creating server instance on port ${port}...`);
-    const newServer = app.listen(port, () => {
-      logger.info(`SUCCESS: Express server listening on port ${port}`);
-      
-      // Use the configured webhook URL from environment variables
-      // In production, TELEGRAM_WEBHOOK_URL must be set
-      if (!process.env.TELEGRAM_WEBHOOK_URL && process.env.NODE_ENV === 'production') {
-        logger.warn('TELEGRAM_WEBHOOK_URL is not set in production environment. Webhook functionality may not work correctly.');
-      }
-      
-      const baseUrl = process.env.TELEGRAM_WEBHOOK_URL 
-        ? new URL(process.env.TELEGRAM_WEBHOOK_URL).origin 
-        : process.env.NODE_ENV === 'production'
-          ? 'https://your-app-domain.com' // Placeholder that should be replaced with actual domain
-          : `http://localhost:${port}`;
-      
-      logger.info(`Webhook endpoint: ${baseUrl}/telegram-webhook`);
-      logger.info(`Health check endpoint: ${baseUrl}/health`);
-      logger.info(`Root endpoint: ${baseUrl}/`);
-    });
-    logger.info(`Server instance created, waiting for it to start...`);
-    
-    // Add error handler
-    newServer.on('error', (error) => {
-      logger.error(`SERVER ERROR: ${error.message} (Code: ${error.code})`);
-      
-      if (error.code === 'EADDRINUSE') {
-        logger.error(`CRITICAL: Port ${port} is already in use. This is likely because another instance is running or the port is reserved.`);
-        logger.error(`On Render, make sure the PORT environment variable is set to 8080 in your render.yaml file.`);
-      } else {
-        logger.error('CRITICAL: Server error:', error);
-      }
-    });
-    
-    return newServer;
-  } catch (error) {
-    logger.error(`CRITICAL: Failed to start server on port ${port}:`, error);
-    return null;
-  }
-};
+// Start the server with proper error handling
+let server;
 
-// Start the server
-server = startServer(PORT);
+try {
+  logger.info(`Starting Express server on port ${PORT}...`);
+  server = app.listen(PORT, '0.0.0.0', () => {
+    logger.info(`Server running on port ${PORT}`);
+    
+    // Use the configured webhook URL from environment variables
+    // In production, TELEGRAM_WEBHOOK_URL must be set
+    if (!process.env.TELEGRAM_WEBHOOK_URL && process.env.NODE_ENV === 'production') {
+      logger.warn('TELEGRAM_WEBHOOK_URL is not set in production environment. Webhook functionality may not work correctly.');
+    }
+    
+    const baseUrl = process.env.TELEGRAM_WEBHOOK_URL 
+      ? new URL(process.env.TELEGRAM_WEBHOOK_URL).origin 
+      : process.env.NODE_ENV === 'production'
+        ? 'https://your-app-domain.com' // Placeholder that should be replaced with actual domain
+        : `http://localhost:${PORT}`;
+    
+    logger.info(`Webhook endpoint: ${baseUrl}/telegram-webhook`);
+    logger.info(`Health check endpoint: ${baseUrl}/health`);
+    logger.info(`Root endpoint: ${baseUrl}/`);
+  });
+  
+  // Add error handler
+  server.on('error', (error) => {
+    logger.error(`SERVER ERROR: ${error.message} (Code: ${error.code})`);
+    
+    if (error.code === 'EADDRINUSE') {
+      logger.error(`CRITICAL: Port ${PORT} is already in use. This is likely because another instance is running or the port is reserved.`);
+      logger.error(`On Render, make sure the PORT environment variable is set to 8080 in your render.yaml file.`);
+    } else {
+      logger.error('CRITICAL: Server error:', error);
+    }
+  });
+} catch (error) {
+  logger.error(`CRITICAL: Failed to start server on port ${PORT}:`, error);
+  server = null;
+}
 
-// Error handling is now integrated into the startServer function
+// Error handling for server initialization
 if (!server) {
   logger.error('CRITICAL: Server was not initialized properly');
 }

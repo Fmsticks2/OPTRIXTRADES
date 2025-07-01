@@ -39,8 +39,8 @@ if (isTestMode) {
     startPolling: () => {}
   };
 } else if (useWebhook && webhookUrl) {
-  // Webhook mode
-  bot = new TelegramBot(botToken, { webHook: { port: process.env.PORT || 8080 } });
+  // Webhook mode - without starting a server
+  bot = new TelegramBot(botToken, { webHook: false });
   
   // Set webhook
   bot.setWebHook(webhookUrl)
