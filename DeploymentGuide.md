@@ -173,7 +173,9 @@ PORT=3000
 3. **Redis connection issues**:
    - When using Render's Redis, make sure you're using the full Redis URL in the `REDIS_HOST` variable
    - The URL should look like `redis://red-xxxxxxxxxx:6379`
-   - Do not set `REDIS_PORT` or `REDIS_PASSWORD` separately when using the Redis URL
+   - The application has been updated to properly parse Redis URLs in all services (main Redis client, queue service, and jobs service), but if you encounter issues, you can try these alternatives:
+       - Option 1: Keep using `REDIS_HOST` with the full URL (recommended)
+       - Option 2: Set `REDIS_HOST` to just the hostname (e.g., `red-xxxxxxxxxx`) and set `REDIS_PORT=6379` separately
    - Ensure Redis is accessible from your web service (they should be in the same region)
    - If Redis is optional for your application, you can set `USE_REDIS=false` to use the mock Redis client
 

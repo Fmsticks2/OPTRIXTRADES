@@ -1,5 +1,6 @@
 const winston = require('winston');
 const path = require('path');
+const fs = require('fs');
 
 // Define log format
 const logFormat = winston.format.combine(
@@ -12,35 +13,65 @@ const logFormat = winston.format.combine(
 // Define log directory
 const logDir = path.join(process.cwd(), 'logs');
 
+// Create logs directory if it doesn't exist
+try {
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+    console.log(`Created logs directory at ${logDir}`);
+  }
+} catch (error) {
+  console.error(`Error creating logs directory: ${error.message}`);
+  // In production environments like Render, we might not have write access to create directories
+  // In this case, we'll just log to console
+}
+
+// Determine if we should log to files based on environment
+const isProduction = process.env.NODE_ENV === 'production';
+const canWriteToFileSystem = process.env.CAN_WRITE_LOGS !== 'false';
+
+// Create transports array
+const transports = [
+  // Write logs to console
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(
+        info => `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`
+      )
+    )
+  })
+];
+
+// Add file transports if we can write to the file system
+if (canWriteToFileSystem) {
+  try {
+    transports.push(
+      // Write error logs to file
+      new winston.transports.File({ 
+        filename: path.join(logDir, 'error.log'), 
+        level: 'error' 
+      }),
+      // Write all logs to file
+      new winston.transports.File({ 
+        filename: path.join(logDir, 'combined.log') 
+      })
+    );
+  } catch (error) {
+    console.error(`Error setting up file transports: ${error.message}`);
+  }
+}
+
 // Create logger instance
 const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: isProduction ? 'info' : 'debug',
   format: logFormat,
   defaultMeta: { service: 'optrixtrades-bot' },
-  transports: [
-    // Write logs to console
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(
-          info => `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`
-        )
-      )
-    }),
-    // Write all logs to file
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'error.log'), 
-      level: 'error' 
-    }),
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'combined.log') 
-    })
-  ],
-  exceptionHandlers: [
+  transports: transports,
+  exceptionHandlers: canWriteToFileSystem ? [
     new winston.transports.File({ 
       filename: path.join(logDir, 'exceptions.log') 
     })
-  ]
+  ] : []
 });
 
 /**

@@ -4,17 +4,67 @@ const { logger, logError } = require('../utils/logger');
 const followUpService = require('../services/followUpService');
 const analyticsService = require('../services/analyticsService');
 
-// Create Redis client
-const redisClient = new Redis({
-  port: process.env.REDIS_PORT || 6379,
-  host: process.env.REDIS_HOST || 'localhost',
-  password: process.env.REDIS_PASSWORD || '',
-  db: 0,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000);
-    return delay;
+// Parse Redis connection options
+let redisConfig;
+
+// Check if REDIS_HOST is a URL (like the one provided by Render)
+if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
+  logger.info('Jobs service using Redis URL connection string');
+  try {
+    // Parse the Redis URL to extract host and port
+    const redisUrl = new URL(process.env.REDIS_HOST);
+    
+    // Extract password from auth part of the URL if it exists
+    let password = undefined;
+    if (redisUrl.username || redisUrl.password) {
+      // The password might be in the username field for some Redis URLs
+      password = redisUrl.password || redisUrl.username;
+    }
+    
+    redisConfig = {
+      port: parseInt(redisUrl.port || '6379', 10),
+      host: redisUrl.hostname,
+      password: password,
+      db: 0,
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      }
+    };
+    
+    logger.info(`Jobs Redis config: host=${redisUrl.hostname}, port=${redisConfig.port}`);
+  } catch (error) {
+    logger.error('Failed to parse Redis URL for jobs:', error.message);
+    // Fallback to using default options
+    redisConfig = {
+      port: process.env.REDIS_PORT || 6379,
+      host: process.env.REDIS_HOST || 'localhost',
+      password: process.env.REDIS_PASSWORD || '',
+      db: 0,
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      }
+    };
   }
-});
+} else {
+  // Use traditional host/port/password configuration
+  redisConfig = {
+    port: process.env.REDIS_PORT || 6379,
+    host: process.env.REDIS_HOST || 'localhost',
+    password: process.env.REDIS_PASSWORD || '',
+    db: 0,
+    retryStrategy: (times) => {
+      const delay = Math.min(times * 50, 2000);
+      return delay;
+    }
+  };
+  
+  logger.info(`Jobs Redis config: host=${process.env.REDIS_HOST}, port=${redisConfig.port}`);
+}
+
+// Create Redis client
+const redisClient = new Redis(redisConfig);
 
 // Create queues
 const followUpQueue = new Queue('follow-up-queue', { 

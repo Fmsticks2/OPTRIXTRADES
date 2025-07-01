@@ -28,14 +28,43 @@ let redisConfig;
 
 // Check if REDIS_HOST is a URL (like the one provided by Render)
 if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
-  // Use the URL directly
   logger.info('Using Redis URL connection string');
-  redisConfig = process.env.REDIS_HOST;
+  try {
+    // Parse the Redis URL to extract host and port
+    const redisUrl = new URL(process.env.REDIS_HOST);
+    
+    // Extract password from auth part of the URL if it exists
+    let password = undefined;
+    if (redisUrl.username || redisUrl.password) {
+      // The password might be in the username field for some Redis URLs
+      password = redisUrl.password || redisUrl.username;
+    }
+    
+    redisConfig = {
+      host: redisUrl.hostname,
+      port: parseInt(redisUrl.port || '6379', 10),
+      password: password,
+      retryStrategy: (times) => {
+        // Exponential backoff with max 30 seconds
+        const delay = Math.min(times * 50, 30000);
+        return delay;
+      },
+      maxRetriesPerRequest: 3,
+      enableOfflineQueue: false
+    };
+    
+    logger.info(`Redis config created: host=${redisUrl.hostname}, port=${redisConfig.port}`);
+  } catch (error) {
+    logger.error('Failed to parse Redis URL:', error.message);
+    // Fallback to using the URL directly
+    logger.info('Falling back to using Redis URL directly');
+    redisConfig = process.env.REDIS_HOST;
+  }
 } else {
   // Use traditional host/port/password configuration
   redisConfig = {
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
     password: process.env.REDIS_PASSWORD || undefined, // Only set if not empty
     retryStrategy: (times) => {
       // Exponential backoff with max 30 seconds
@@ -45,6 +74,8 @@ if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
     maxRetriesPerRequest: 3,
     enableOfflineQueue: false
   };
+  
+  logger.info(`Redis config created: host=${process.env.REDIS_HOST}, port=${redisConfig.port}`);
 }
 
 // Create Redis client or mock client

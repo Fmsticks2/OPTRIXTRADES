@@ -35,7 +35,8 @@ const optionalVars = {
   'TELEGRAM_USE_WEBHOOK': 'true',
   'DB_PORT': '5432',
   'REDIS_PORT': '6379',
-  'USE_REDIS': 'true'
+  'USE_REDIS': 'true',
+  'CAN_WRITE_LOGS': 'false'
 };
 
 // Check if .env.production exists
@@ -142,12 +143,25 @@ if (redisHost) {
   }
 }
 
+// Check logging configuration
+const canWriteLogs = envLines.find(line => line.startsWith('CAN_WRITE_LOGS='))?.split('=')[1];
+if (canWriteLogs === undefined) {
+  console.log('\n⚠️ CAN_WRITE_LOGS environment variable is not defined.');
+  console.log('For Render deployment, set CAN_WRITE_LOGS=false as file system writes are restricted.');
+  console.log('This will ensure logs are properly directed to the console instead.\n');
+} else if (canWriteLogs.toLowerCase() === 'true') {
+  console.log('\n⚠️ CAN_WRITE_LOGS is set to true.');
+  console.log('Render has restrictions on file system writes. Consider setting it to false.');
+  console.log('You can view all logs in the Render dashboard under the "Logs" tab.\n');
+}
+
 // Final checklist
 console.log('=== Deployment Checklist ===');
 console.log('✅ .env.production file exists');
 console.log(`${missingVars.length === 0 ? '✅' : '❌'} All required environment variables are defined`);
 console.log(`${placeholders.length === 0 ? '✅' : '⚠️'} Environment variables have proper values`);
 console.log(`${webhookEnabled ? '✅' : '⚠️'} Webhook mode is ${webhookEnabled ? 'enabled' : 'disabled'} for production`);
+console.log(`${canWriteLogs === 'false' ? '✅' : '⚠️'} Logging configuration is ${canWriteLogs === 'false' ? 'optimized' : 'not optimized'} for Render`);
 
 console.log('\n=== Next Steps ===');
 console.log('1. Commit your changes (excluding .env files)');

@@ -8,12 +8,49 @@ const { logger } = require('../utils/logger');
 const { ServiceUnavailableError } = require('../utils/errorHandler');
 const { redisClient } = require('../config/redis');
 
-// Redis connection options from existing client
-const redisOptions = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379', 10),
-  password: process.env.REDIS_PASSWORD || undefined
-};
+// Parse Redis connection options
+let redisOptions;
+
+// Check if REDIS_HOST is a URL (like the one provided by Render)
+if (process.env.REDIS_HOST && process.env.REDIS_HOST.startsWith('redis://')) {
+  logger.info('Queue service using Redis URL connection string');
+  try {
+    // Parse the Redis URL to extract host and port
+    const redisUrl = new URL(process.env.REDIS_HOST);
+    
+    // Extract password from auth part of the URL if it exists
+    let password = undefined;
+    if (redisUrl.username || redisUrl.password) {
+      // The password might be in the username field for some Redis URLs
+      password = redisUrl.password || redisUrl.username;
+    }
+    
+    redisOptions = {
+      host: redisUrl.hostname,
+      port: parseInt(redisUrl.port || '6379', 10),
+      password: password
+    };
+    
+    logger.info(`Queue Redis config: host=${redisUrl.hostname}, port=${redisOptions.port}`);
+  } catch (error) {
+    logger.error('Failed to parse Redis URL for queue:', error.message);
+    // Fallback to using default options
+    redisOptions = {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      password: process.env.REDIS_PASSWORD || undefined
+    };
+  }
+} else {
+  // Use traditional host/port/password configuration
+  redisOptions = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || undefined
+  };
+  
+  logger.info(`Queue Redis config: host=${process.env.REDIS_HOST}, port=${redisOptions.port}`);
+}
 
 // Queue names
 const VERIFICATION_QUEUE = 'verification-processing';
