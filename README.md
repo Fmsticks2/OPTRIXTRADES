@@ -24,6 +24,8 @@ A comprehensive Telegram bot for OPTRIXTRADES, providing trading signals, user v
 │   ├── models/         # Data models
 │   ├── services/       # Business logic services
 │   ├── utils/          # Utility functions
+│   │   ├── botExtensions.js  # Custom Telegram Bot API extensions
+│   │   └── ...         # Other utility files
 │   └── index.js        # Main bot initialization
 ├── app.js             # Application entry point
 ├── .env               # Environment variables (not in repo)
@@ -39,6 +41,12 @@ A comprehensive Telegram bot for OPTRIXTRADES, providing trading signals, user v
 - **followUpService**: Automated follow-up sequence
 - **analyticsService**: Statistical reports and analytics
 - **adminService**: Administrative functions
+
+## Bot Extensions
+
+The bot has been extended with custom methods not available in the official Telegram Bot API:
+
+- **inviteUserToChannel(channelId, userId)**: Creates an invite link for a channel and sends it to the user. Used for adding users to premium and VIP channels based on their subscription tier.
 
 ## Controllers
 

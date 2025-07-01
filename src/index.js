@@ -4,6 +4,9 @@ const { initDatabase } = require('./database/init');
 const { initializeScheduledJobs } = require('./jobs');
 const { logger } = require('./utils/logger');
 
+// Load bot extensions
+require('./utils/botExtensions');
+
 // Check if webhook mode is enabled
 const useWebhook = process.env.TELEGRAM_USE_WEBHOOK === 'true';
 
